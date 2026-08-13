@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula 10 — Segurança Digital | Atividade Interativa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #161D27;
+    --surface: #1F2A38;
+    --surface-raised: #29374A;
+    --line: #3A4A5E;
+    --paper: #EFE7D4;
+    --paper-dim: #C9C0AA;
+    --gold: #C9A227;
+    --gold-bright: #E4C55E;
+    --safe: #4FA179;
+    --safe-bg: #1E332B;
+    --danger: #C1443C;
+    --danger-bg: #34211F;
+    --radius: 10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, #223349 0%, transparent 60%),
+      var(--ink);
+    color: var(--paper);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding: 32px 18px 60px;
+  }
+  .wrap{max-width: 880px; margin: 0 auto;}
+
+  /* ---------- HEADER ---------- */
+  header{
+    text-align:center;
+    padding: 18px 0 34px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 30px;
+    position:relative;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-bright);
+    margin-bottom: 14px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(28px, 5vw, 44px);
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+  header p{
+    color: var(--paper-dim);
+    font-size: 15px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .dial{
+    width:64px; height:64px; margin:0 auto 18px;
+    border-radius:50%;
+    border: 3px solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    background: conic-gradient(from 0deg, #2b3a4f, #1a2432 40%, #2b3a4f 80%);
+    animation: turn 14s linear infinite;
+  }
+  .dial::before{
+    content:"";
+    width:6px; height:6px; border-radius:50%;
+    background: var(--gold-bright);
+    position:absolute; top:6px; left:50%; transform: translateX(-50%);
+    box-shadow: 0 0 8px var(--gold-bright);
+  }
+  .dial::after{
+    content:"🔒";
+    font-size: 22px;
+  }
+  @keyframes turn{ to{ transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){ .dial{ animation:none; } }
+
+  /* ---------- TABS ---------- */
+  nav.tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom: 26px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  nav.tabs button{
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size: 14px;
+    color: var(--paper-dim);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 11px 18px;
+    border-radius: 999px;
+    cursor:pointer;
+    transition: all .18s ease;
+  }
+  nav.tabs button:hover{ color:var(--paper); border-color: var(--gold); }
+  nav.tabs button.active{
+    background: var(--gold);
+    color: #1A1305;
+    border-color: var(--gold);
+  }
+  nav.tabs button:focus-visible{ outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+
+  section.panel{ display:none; }
+  section.panel.active{ display:block; animation: fadein .3s ease; }
+  @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 26px;
+    margin-bottom: 18px;
+  }
+  .card h2{
+    font-family:'Fraunces', serif;
+    font-size: 22px;
+    font-weight:600;
+    margin: 0 0 6px;
+    color: var(--gold-bright);
+  }
+  .card .sub{ color: var(--paper-dim); font-size: 14px; margin-bottom: 20px; }
+
+  /* ---------- ACTIVITY 1: PASSWORD ---------- */
+  input#pwInput{
+    width:100%;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 18px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--ink);
+    color: var(--paper);
+    margin-bottom: 18px;
+  }
+  input#pwInput:focus{ outline:2px solid var(--gold); border-color:var(--gold); }
+  .checklist{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+  @media (max-width:520px){ .checklist{ grid-template-columns: 1fr; } }
+  .check-item{
+    display:flex; align-items:center; gap:10px;
+    font-size: 14px; color: var(--paper-dim);
+    padding: 9px 12px; border-radius:8px; background: var(--surface-raised);
+    border:1px solid var(--line);
+    transition: all .2s ease;
+  }
+  .check-item .mark{
+    width:20px; height:20px; border-radius:50%;
+    border:1.5px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 12px; flex-shrink:0;
+  }
+  .check-item.ok{ color: var(--paper); background: var(--safe-bg); border-color: var(--safe); }
+  .check-item.ok .mark{ background: var(--safe); border-color: var(--safe); }
+  .meter{ height:8px; border-radius:99px; background: var(--surface-raised); overflow:hidden; margin-bottom:10px; }
+  .meter-fill{ height:100%; width:0%; background: var(--danger); transition: all .3s ease; border-radius:99px; }
+  .meter-label{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.06em; color: var(--paper-dim); text-transform:uppercase; margin-bottom: 20px;}
+  .hint-box{
+    background: var(--surface-raised); border-left:3px solid var(--gold);
+    border-radius: 6px; padding: 14px 16px; font-size: 14px; color: var(--paper-dim); line-height:1.6;
+  }
+  .hint-box b{ color: var(--paper); }
+
+  /* ---------- ACTIVITY 2: PHISHING ---------- */
+  .msg-counter{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--paper-dim); text-align:right; margin-bottom:10px; }
+  .letter{
+    background: var(--paper);
+    color: #241c0c;
+    border-radius: 6px;
+    padding: 22px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 14.5px;
+    line-height: 1.65;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    position:relative;
+    min-height: 140px;
+  }
+  .letter .from{ color:#6b5a2c; font-size:12px; margin-bottom:10px; }
+  .stamp{
+    position:absolute; top:14px; right:14px;
+    font-family:'Fraunces', serif; font-weight:700;
+    font-size: 22px; letter-spacing: .04em;
+    padding: 6px 14px;
+    border: 3px solid currentColor;
+    border-radius: 6px;
+    transform: rotate(8deg) scale(0);
+    opacity:0;
+    transition: transform .32s cubic-bezier(.2,1.4,.4,1), opacity .2s ease;
+  }
+  .stamp.show{ transform: rotate(8deg) scale(1); opacity:1; }
+  .stamp.aprovado{ color: var(--safe); }
+  .stamp.golpe{ color: var(--danger); }
+  .quiz-actions{ display:flex; gap:12px; margin-top:20px; }
+  .quiz-actions button{
+    flex:1; padding: 13px; font-weight:700; font-size:14px;
+    border-radius: 8px; cursor:pointer; border:1px solid var(--line);
+    background: var(--surface-raised); color: var(--paper);
+    transition: all .15s ease;
+  }
+  .quiz-actions button:hover:not(:disabled){ border-color: var(--gold); }
+  .quiz-actions button:disabled{ opacity:.4; cursor:not-allowed; }
+  .explain{
+    margin-top:16px; padding: 14px 16px; border-radius:8px; font-size:14px; line-height:1.6;
+    display:none;
+  }
+  .explain.show{ display:block; }
+  .explain.real{ background: var(--safe-bg); border-left:3px solid var(--safe); }
+  .explain.fake{ background: var(--danger-bg); border-left:3px solid var(--danger); }
+  .nextbtn{
+    margin-top:16px; width:100%; padding:12px; border-radius:8px; border:none;
+    background: var(--gold); color:#1A1305; font-weight:700; cursor:pointer; display:none;
+  }
+  .nextbtn.show{ display:block; }
+  .score-final{ text-align:center; padding: 30px 0; }
+  .score-final .num{ font-family:'Fraunces', serif; font-size:52px; color: var(--gold-bright); }
+
+  /* ---------- ACTIVITY 3: MATCHING ---------- */
+  .match-grid{ display:grid; grid-template-columns: 1fr; gap: 14px; }
+  .scenario{
+    background: var(--surface-raised);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:16px 18px;
+  }
+  .scenario p{ margin:0 0 12px; font-size:14.5px; color:var(--paper); line-height:1.5; }
+  .opts{ display:flex; gap:8px; flex-wrap:wrap; }
+  .opts button{
+    font-size:13px; font-weight:600; padding:8px 14px; border-radius:99px;
+    border:1px solid var(--line); background: var(--ink); color: var(--paper-dim); cursor:pointer;
+    transition: all .15s ease;
+  }
+  .opts button:hover:not(:disabled){ border-color:var(--gold); color:var(--paper); }
+  .opts button.correct{ background: var(--safe); border-color:var(--safe); color:#0B1F16; }
+  .opts button.wrong{ background: var(--danger); border-color:var(--danger); color:#fff; }
+  .opts button:disabled{ cursor:default; }
+  .scenario .fb{ font-size:13px; color: var(--paper-dim); margin-top:10px; display:none; }
+  .scenario .fb.show{ display:block; }
+
+  /* ---------- footer ---------- */
+  footer{ text-align:center; margin-top: 40px; color: var(--paper-dim); font-size: 13px; }
+  .reset-link{ background:none; border:none; color:var(--gold-bright); text-decoration:underline; cursor:pointer; font-size:13px; font-family:inherit; }
+
+  .empty-note{ color:var(--paper-dim); font-size:14px; text-align:center; padding:20px 0; }
+</style>
+</head>
+<body>
+
+<div id="nameGate">
+  <div class="gate-card">
+    <h2>Antes de começar</h2>
+    <p>Digite seu nome para o professor conseguir acompanhar quem concluiu as atividades. Esse nome e os resultados ficam visíveis para a turma toda.</p>
+    <input type="text" id="nameInput" placeholder="Seu nome" autocomplete="off">
+    <button id="gateSubmit">Começar atividade</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header>
+    <div class="dial" aria-hidden="true"></div>
+    <div class="eyebrow">SESI Viçosa · Aula 10</div>
+    <h1>Segurança Digital na Prática</h1>
+    <p>Três exercícios rápidos para testar o que aprendemos sobre senhas, golpes e defesas do computador.</p>
+  </header>
+
+  <div class="user-badge" id="userBadge" style="display:none;"></div>
+
+  <nav class="tabs" role="tablist" aria-label="Atividades">
+    <button class="tab-btn active" data-tab="senha" role="tab" aria-selected="true">🔑 Laboratório de Senha</button>
+    <button class="tab-btn" data-tab="phishing" role="tab" aria-selected="false">✉️ Detector de Golpes</button>
+    <button class="tab-btn" data-tab="trio" role="tab" aria-selected="false">🛡️ Trio de Defesa</button>
+    <button class="tab-btn" data-tab="painel" role="tab" aria-selected="false">📋 Painel do Professor</button>
+  </nav>
+
+  <!-- ACTIVITY 1: PASSWORD LAB -->
+  <section class="panel active" id="panel-senha">
+    <div class="card">
+      <h2>Teste sua senha-frase</h2>
+      <p class="sub">Digite uma senha de exemplo (nunca a sua senha real!) e veja se ela cumpre as 4 regras da aula.</p>
+
+      <input type="text" id="pwInput" placeholder="Ex.: Mpcfae2015!" autocomplete="off" spellcheck="false">
+
+      <div class="meter"><div class="meter-fill" id="meterFill"></div></div>
+      <div class="meter-label" id="meterLabel">AGUARDANDO DIGITAÇÃO...</div>
+
+      <div class="checklist">
+        <div class="check-item" id="c-len"><span class="mark">–</span> 8 a 12+ caracteres</div>
+        <div class="check-item" id="c-upper"><span class="mark">–</span> Letra maiúscula</div>
+        <div class="check-item" id="c-num"><span class="mark">–</span> Número</div>
+        <div class="check-item" id="c-sym"><span class="mark">–</span> Símbolo (@ # $ % !)</div>
+      </div>
+
+      <div class="hint-box">
+        <b>Lembrete do Método da Frase-Chave:</b> pense numa frase pessoal — "Meu primeiro carro foi azul em 2015!" — pegue a primeira letra de cada palavra e junte o número e o símbolo do final. Resultado: <i>Mpcfae2015!</i>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACTIVITY 2: PHISHING DETECTOR -->
+  <section class="panel" id="panel-phishing">
+    <div class="card">
+      <h2>É golpe ou é real?</h2>
+      <p class="sub">Leia cada mensagem e decida: você aprovaria ou identificaria como fraude?</p>
+      <div class="msg-counter" id="msgCounter">Mensagem 1 de 5</div>
+
+      <div class="letter" id="letterBox">
+        <div class="from" id="letterFrom"></div>
+        <div id="letterBody"></div>
+        <div class="stamp" id="stamp"></div>
+      </div>
+
+      <div class="quiz-actions">
+        <button id="btnReal">✅ Parece Real</button>
+        <button id="btnFake">🚩 É Golpe</button>
+      </div>
+
+      <div class="explain" id="explainBox"></div>
+      <button class="nextbtn" id="nextBtn">Próxima mensagem →</button>
+    </div>
+  </section>
+
+  <!-- ACTIVITY 3: TRIO DE DEFESA MATCHING -->
+  <section class="panel" id="panel-trio">
+    <div class="card">
+      <h2>Qual defesa entra em ação?</h2>
+      <p class="sub">Para cada situação, escolha se quem resolve é o Antivírus, o Firewall ou a Atualização.</p>
+      <div class="match-grid" id="matchGrid"></div>
+    </div>
+  </section>
+
+  <!-- ACTIVITY 4: PAINEL DO PROFESSOR -->
+  <section class="panel" id="panel-painel">
+    <div class="card">
+      <h2>Progresso da turma</h2>
+      <p class="sub">Mostra todos os alunos que já abriram a atividade nesta sala, e o que cada um já concluiu.</p>
+      <button class="panel-refresh" id="refreshPanel">↻ Atualizar lista</button>
+      <div id="panelContent"><p class="empty-note">Clique em "Atualizar lista" para carregar.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Checklist completo, atividades e casos reais seguem o roteiro da Aula 10.</p>
+    <button class="reset-link" onclick="location.reload()">↺ Reiniciar atividades</button>
+  </footer>
+</div>
+
+<script>
+// ---------- CONFIG ----------
+// Cole aqui a URL do seu Apps Script depois de publicá-lo como Web App.
+// Exemplo: "https://script.google.com/macros/s/AKfycb.../exec"
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZomQVM6lGuM0-aQNyRkNEz-xUL7gqRVl0xaosQ5kh5rpc54mYoTRrgpgpx62MXyhblw/exec";
+
+// ---------- NAME GATE + PROGRESS TRACKING ----------
+let currentUser = null;
+let myProgress = null;
+
+function slugify(name){
+  return name.trim().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'aluno';
+}
+
+async function saveProgress(){
+  if(!myProgress) return;
+  myProgress.updatedAt = new Date().toISOString();
+  try{
+    // Content-Type text/plain evita o preflight CORS que o Apps Script não responde bem.
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(myProgress)
+    });
+  }catch(e){
+    console.error('Falha ao salvar progresso', e);
+  }
+}
+
+document.getElementById('gateSubmit').addEventListener('click', startSession);
+document.getElementById('nameInput').addEventListener('keydown', e=>{ if(e.key==='Enter') startSession(); });
+
+function startSession(){
+  const val = document.getElementById('nameInput').value.trim();
+  if(!val){ document.getElementById('nameInput').focus(); return; }
+  currentUser = val;
+  myProgress = {
+    nome: currentUser,
+    senha: false,
+    phishingScore: null,
+    phishingTotal: null,
+    trioScore: 0,
+    trioTotal: null,
+  };
+  document.getElementById('nameGate').classList.add('hidden');
+  const badge = document.getElementById('userBadge');
+  badge.style.display = 'block';
+  badge.innerHTML = `Aluno: <b style="color:var(--paper)">${currentUser}</b> · <button id="switchUser">trocar</button>`;
+  document.getElementById('switchUser').addEventListener('click', ()=>{
+    document.getElementById('nameGate').classList.remove('hidden');
+    document.getElementById('nameInput').value='';
+  });
+  saveProgress();
+}
+
+// ---------- TABS ----------
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active'); b.setAttribute('aria-selected','false');});
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active'); btn.setAttribute('aria-selected','true');
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ---------- ACTIVITY 1: PASSWORD ----------
+const pwInput = document.getElementById('pwInput');
+const meterFill = document.getElementById('meterFill');
+const meterLabel = document.getElementById('meterLabel');
+const checks = {
+  len: {el: document.getElementById('c-len'), test: v => v.length >= 8},
+  upper: {el: document.getElementById('c-upper'), test: v => /[A-Z]/.test(v)},
+  num: {el: document.getElementById('c-num'), test: v => /[0-9]/.test(v)},
+  sym: {el: document.getElementById('c-sym'), test: v => /[^A-Za-z0-9\s]/.test(v)},
+};
+const labels = ["FRACA — FALTAM VÁRIAS REGRAS","FRACA — TENTE MAIS UM POUCO","RAZOÁVEL — QUASE LÁ","BOA","FORTE — SENHA APROVADA!"];
+const colors = ["#C1443C","#C1443C","#C9A227","#4FA179","#4FA179"];
+
+pwInput.addEventListener('input', ()=>{
+  const v = pwInput.value;
+  let passed = 0;
+  Object.values(checks).forEach(c=>{
+    const ok = c.test(v);
+    c.el.classList.toggle('ok', ok);
+    c.el.querySelector('.mark').textContent = ok ? '✓' : '–';
+    if(ok) passed++;
+  });
+  const pct = v.length===0 ? 0 : (passed/4)*100;
+  meterFill.style.width = pct+'%';
+  meterFill.style.background = colors[passed];
+  meterLabel.textContent = v.length===0 ? 'AGUARDANDO DIGITAÇÃO...' : labels[passed];
+  meterLabel.style.color = v.length===0 ? '' : colors[passed];
+  if(passed===4 && myProgress && !myProgress.senha){
+    myProgress.senha = true;
+    saveProgress();
+  }
+});
+
+// ---------- ACTIVITY 2: PHISHING ----------
+const messages = [
+  {
+    from: "De: seguranca@bb-atualizacao-cliente.net",
+    body: "Prezado cliente, identificamos uma pendência no seu cadastramento de segurança. Clique no link abaixo para atualizar em até 2 horas, ou seu cartão será bloqueado permanentemente.",
+    isFake: true,
+    explain: "🚩 Golpe clássico: urgência extrema (2 horas), ameaça de bloqueio e um remetente que não é o domínio oficial do banco. Bancos nunca pedem atualização de cadastro por link."
+  },
+  {
+    from: "De: Prima Joana (WhatsApp)",
+    body: "Oi, mudei de número! Salva esse contato novo. Preciso de um favor urgente, pode me fazer um PIX de 300 reais? Te explico depois, tô sem tempo agora.",
+    isFake: true,
+    explain: "🚩 Golpe do parente: número novo + pedido de dinheiro + pressa para não dar tempo de confirmar. A regra de ouro é ligar para o número antigo antes de qualquer transferência."
+  },
+  {
+    from: "De: notificacoes@meuemail-pessoal.com",
+    body: "Olá! Seu backup automático no OneDrive foi concluído com sucesso às 22h14. Nenhuma ação é necessária.",
+    isFake: false,
+    explain: "✅ Mensagem real: é apenas uma notificação informativa, sem links suspeitos, sem urgência e sem pedido de dados ou dinheiro."
+  },
+  {
+    from: "De: Suporte Técnico Microsoft (SMS)",
+    body: "Identificamos um vírus perigoso na sua conta. Ligue AGORA para o número 0800-XXX-XXXX ou seu computador será bloqueado em 1 hora.",
+    isFake: true,
+    explain: "🚩 Falso suporte técnico: empresas não monitoram seu computador por fora e não avisam por SMS com prazo curto. Nunca ligue para números enviados assim."
+  },
+  {
+    from: "De: contato@sesi.org.br",
+    body: "Lembrete: nossa próxima aula do curso de informática básica será na quinta-feira, às 14h, na sala 3. Até lá!",
+    isFake: false,
+    explain: "✅ Mensagem real: informativa, sem pedido de dados, sem link duvidoso e sem senso de urgência artificial."
+  }
+];
+let msgIndex = 0, score = 0, answered = false;
+
+function loadMsg(){
+  if(msgIndex >= messages.length){ showFinalScore(); return; }
+  const m = messages[msgIndex];
+  document.getElementById('msgCounter').textContent = `Mensagem ${msgIndex+1} de ${messages.length}`;
+  document.getElementById('letterFrom').textContent = m.from;
+  document.getElementById('letterBody').textContent = m.body;
+  const stamp = document.getElementById('stamp');
+  stamp.className = 'stamp';
+  stamp.textContent = '';
+  document.getElementById('explainBox').className = 'explain';
+  document.getElementById('nextBtn').classList.remove('show');
+  document.getElementById('btnReal').disabled = false;
+  document.getElementById('btnFake').disabled = false;
+  answered = false;
+}
+
+function answer(choseFake){
+  if(answered) return;
+  answered = true;
+  const m = messages[msgIndex];
+  const correct = (choseFake === m.isFake);
+  if(correct) score++;
+  const stamp = document.getElementById('stamp');
+  stamp.textContent = m.isFake ? 'GOLPE' : 'APROVADO';
+  stamp.classList.add('show', m.isFake ? 'golpe' : 'aprovado');
+  const box = document.getElementById('explainBox');
+  box.textContent = (correct ? '✔ Certeza! ' : '✘ Quase — ') + m.explain;
+  box.classList.add('show', m.isFake ? 'fake' : 'real');
+  document.getElementById('btnReal').disabled = true;
+  document.getElementById('btnFake').disabled = true;
+  document.getElementById('nextBtn').classList.add('show');
+}
+document.getElementById('btnReal').addEventListener('click', ()=>answer(false));
+document.getElementById('btnFake').addEventListener('click', ()=>answer(true));
+document.getElementById('nextBtn').addEventListener('click', ()=>{ msgIndex++; loadMsg(); });
+
+function showFinalScore(){
+  document.getElementById('letterBox').outerHTML = `
+    <div class="score-final">
+      <div class="num">${score}/${messages.length}</div>
+      <p>mensagens classificadas corretamente</p>
+    </div>`;
+  document.querySelector('.quiz-actions').style.display='none';
+  document.getElementById('nextBtn').classList.remove('show');
+  if(myProgress){
+    myProgress.phishingScore = score;
+    myProgress.phishingTotal = messages.length;
+    saveProgress();
+  }
+}
+loadMsg();
+
+// ---------- ACTIVITY 3: TRIO DE DEFESA ----------
+const scenarios = [
+  {text:"Você baixou um arquivo de um pendrive e ele contém um código malicioso escondido.", answer:"Antivírus", explain:"O Antivírus analisa arquivos baixados e de pendrives, colocando ameaças em quarentena."},
+  {text:"Um programa desconhecido na internet está tentando se conectar ao seu computador à distância.", answer:"Firewall", explain:"O Firewall monitora o tráfego de rede e bloqueia conexões não autorizadas."},
+  {text:"Seu Windows está há 6 meses sem instalar as correções de segurança da Microsoft.", answer:"Atualização", explain:"As Atualizações fecham as 'brechas' descobertas pelos hackers no sistema."},
+  {text:"Você recebe um pendrive de um colega e quer verificar se ele está livre de vírus antes de abrir.", answer:"Antivírus", explain:"O Antivírus é quem inspeciona arquivos externos como pendrives antes do uso."},
+];
+const options = ["Antivírus","Firewall","Atualização"];
+const grid = document.getElementById('matchGrid');
+let trioAnswered = 0, trioCorrect = 0;
+scenarios.forEach((s, i)=>{
+  const div = document.createElement('div');
+  div.className = 'scenario';
+  div.innerHTML = `
+    <p>${i+1}. ${s.text}</p>
+    <div class="opts">
+      ${options.map(o=>`<button data-opt="${o}">${o}</button>`).join('')}
+    </div>
+    <div class="fb"></div>
+  `;
+  grid.appendChild(div);
+  const buttons = div.querySelectorAll('.opts button');
+  const fb = div.querySelector('.fb');
+  buttons.forEach(b=>{
+    b.addEventListener('click', ()=>{
+      buttons.forEach(x=>x.disabled = true);
+      const correct = b.dataset.opt === s.answer;
+      if(correct){
+        b.classList.add('correct');
+        trioCorrect++;
+      } else {
+        b.classList.add('wrong');
+        buttons.forEach(x=>{ if(x.dataset.opt===s.answer) x.classList.add('correct'); });
+      }
+      fb.textContent = s.explain;
+      fb.classList.add('show');
+      trioAnswered++;
+      if(trioAnswered === scenarios.length && myProgress){
+        myProgress.trioScore = trioCorrect;
+        myProgress.trioTotal = scenarios.length;
+        saveProgress();
+      }
+    });
+  });
+});
+
+// ---------- TEACHER PANEL ----------
+document.getElementById('refreshPanel').addEventListener('click', loadPanel);
+
+async function loadPanel(){
+  const content = document.getElementById('panelContent');
+  content.innerHTML = '<p class="empty-note">Carregando...</p>';
+  try{
+    const resp = await fetch(APPS_SCRIPT_URL, { method: 'GET' });
+    const records = await resp.json();
+    if(!records || records.length === 0){
+      content.innerHTML = '<p class="empty-note">Ninguém abriu a atividade ainda.</p>';
+      return;
+    }
+    records.sort((a,b)=> (a.nome||'').localeCompare(b.nome||''));
+
+    const rows = records.map(rec=>{
+      const senhaBadge = rec.senha ? '<span class="badge yes">Concluído</span>' : '<span class="badge no">Pendente</span>';
+      const phishing = rec.phishingScore===null || rec.phishingScore===undefined
+        ? '<span class="badge no">Pendente</span>'
+        : `<span class="badge yes">${rec.phishingScore}/${rec.phishingTotal}</span>`;
+      const trio = !rec.trioTotal
+        ? '<span class="badge no">Pendente</span>'
+        : `<span class="badge yes">${rec.trioScore}/${rec.trioTotal}</span>`;
+      return `<tr><td>${rec.nome||'—'}</td><td>${senhaBadge}</td><td>${phishing}</td><td>${trio}</td></tr>`;
+    }).join('');
+
+    content.innerHTML = `
+      <table class="results">
+        <thead><tr><th>Aluno</th><th>Senha</th><th>Golpes</th><th>Trio</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }catch(e){
+    console.error('Falha ao carregar painel', e);
+    content.innerHTML = '<p class="empty-note">Não foi possível carregar os resultados agora. Tente novamente.</p>';
+  }
+}
+</script>
+</body>
+</html>
