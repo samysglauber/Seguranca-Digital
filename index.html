@@ -48,7 +48,26 @@
   header p{ color: var(--ink-dim); font-size: 15px; max-width: 560px; margin:0; }
 
   nav.tabs{
-    display:flex; gap:8px; margin: 26px 0 22px; flex-wrap:wrap;
+    display:flex; gap:8px; flex-wrap:wrap;
+  }
+  .tabs-row{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    gap:12px; flex-wrap:wrap; margin: 26px 0 22px;
+  }
+  .teacher-btn{
+    position: fixed; top: 18px; right: 18px; z-index: 50;
+    display:flex; align-items:center; justify-content:center;
+    width: 38px; height: 38px; padding:0;
+    font-size: 16px; line-height:1;
+    color: var(--ink-dim); background: var(--surface);
+    border: 1px solid var(--border); border-radius: 50%;
+    cursor:pointer; transition: all .15s ease;
+    box-shadow: var(--shadow);
+  }
+  .teacher-btn:hover{ border-color: var(--primary); color: var(--primary); transform: scale(1.05); }
+  .teacher-btn.active{ background: var(--ink); color:#fff; border-color: var(--ink); }
+  @media (max-width: 480px){
+    .teacher-btn{ top: 12px; right: 12px; width: 34px; height: 34px; font-size: 14px; }
   }
   nav.tabs button{
     display:flex; align-items:center; gap:8px;
@@ -171,8 +190,42 @@
   .scenario .fb{ font-size:12.5px; color: var(--ink-dim); margin-top:10px; display:none; }
   .scenario .fb.show{ display:block; }
 
-  footer{ text-align:center; margin-top: 36px; color: var(--ink-dim); font-size: 13px; }
-  .reset-link{ background:none; border:none; color: var(--primary); text-decoration:underline; cursor:pointer; font-size:13px; font-family:inherit; }
+  .phrase-list{ display:flex; flex-direction:column; gap:10px; margin-bottom: 6px; }
+  .phrase-btn{
+    text-align:left; padding: 14px 16px; border-radius:10px; border:1.5px solid var(--border);
+    background: var(--surface-alt); color: var(--ink); font-family:'IBM Plex Mono', monospace;
+    font-size: 13.5px; cursor:pointer; transition: all .15s ease;
+  }
+  .phrase-btn:hover{ border-color: var(--primary); }
+  .phrase-btn.selected{ background: var(--primary-bg); border-color: var(--primary); font-weight:600; }
+  #fraseComposer{ display:none; margin-top: 20px; padding-top:20px; border-top:1px solid var(--border); }
+  #fraseComposer.show{ display:block; }
+  #fraseComposer .hint-box{ margin-top:0; margin-bottom:18px; }
+  input#fraseInput{
+    width:100%; font-family:'Inter', sans-serif; font-size: 15px; font-weight:500;
+    padding: 14px 16px; border-radius: 10px; border: 1.5px solid var(--border);
+    background: var(--surface-alt); color: var(--ink); margin-bottom: 18px;
+    transition: all .15s ease;
+  }
+  input#fraseInput::placeholder{ color: #9aa2b1; font-weight:400; }
+  input#fraseInput:focus{ outline:none; border-color: var(--primary); background:#fff; box-shadow: 0 0 0 3px var(--primary-bg); }
+  .frase-live{
+    font-size: 13.5px; color: var(--ink-dim); margin-bottom: 18px; padding: 12px 16px;
+    border-radius: 9px; background: var(--surface-alt); border: 1px solid var(--border);
+    transition: all .15s ease;
+  }
+  .frase-live.ok{ background: var(--success-bg); color: var(--success); border-color: var(--success); font-weight:600; }
+  .stamp.concedido{ background: var(--success-bg); color: var(--success); }
+  .stamp.recusado{ background: var(--danger-bg); color: var(--danger); }
+  .perm-app-row{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+  .perm-icon{
+    width:46px; height:46px; border-radius:12px; background: var(--surface);
+    border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
+    font-size:24px; flex-shrink:0;
+  }
+  .perm-appname{ font-family:'Sora', sans-serif; font-weight:700; font-size:15.5px; color: var(--ink); }
+
+
 
   #nameGate{
     position:fixed; inset:0; background: rgba(18,22,31,.55); backdrop-filter: blur(2px);
@@ -238,17 +291,22 @@
   <header>
     <div class="eyebrow">SESI Viçosa · Aula 10</div>
     <h1>Segurança Digital na Prática</h1>
-    <p>Três exercícios rápidos para validar o que aprendemos sobre senhas, golpes e defesas do computador.</p>
+    <p>Cinco exercícios rápidos para validar o que aprendemos sobre senhas, golpes e defesas do computador.</p>
   </header>
 
   <div class="user-badge" id="userBadge" style="display:none;"></div>
 
-  <nav class="tabs" role="tablist" aria-label="Atividades">
-    <button class="tab-btn active" data-tab="senha" role="tab" aria-selected="true"><span class="dot" id="dot-senha"></span>Laboratório de Senha</button>
-    <button class="tab-btn" data-tab="phishing" role="tab" aria-selected="false"><span class="dot" id="dot-phishing"></span>Detector de Golpes</button>
-    <button class="tab-btn" data-tab="trio" role="tab" aria-selected="false"><span class="dot" id="dot-trio"></span>Trio de Defesa</button>
-    <button class="tab-btn" data-tab="painel" role="tab" aria-selected="false">Painel do Professor</button>
-  </nav>
+  <button class="tab-btn teacher-btn" data-tab="painel" role="tab" aria-selected="false" title="Painel do Professor" aria-label="Painel do Professor">⚙</button>
+
+  <div class="tabs-row">
+    <nav class="tabs" role="tablist" aria-label="Atividades">
+      <button class="tab-btn active" data-tab="senha" role="tab" aria-selected="true"><span class="dot" id="dot-senha"></span>Laboratório de Senha</button>
+      <button class="tab-btn" data-tab="frase" role="tab" aria-selected="false"><span class="dot" id="dot-frase"></span>Frase-Chave</button>
+      <button class="tab-btn" data-tab="phishing" role="tab" aria-selected="false"><span class="dot" id="dot-phishing"></span>Detector de Golpes</button>
+      <button class="tab-btn" data-tab="trio" role="tab" aria-selected="false"><span class="dot" id="dot-trio"></span>Trio de Defesa</button>
+      <button class="tab-btn" data-tab="permissoes" role="tab" aria-selected="false"><span class="dot" id="dot-permissoes"></span>Permissões do App</button>
+    </nav>
+  </div>
 
   <section class="panel active" id="panel-senha">
     <div class="card">
@@ -266,9 +324,22 @@
 
       <button class="validate-btn" id="validatePw" disabled>Validar senha</button>
       <div class="validated-msg" id="pwValidatedMsg">✓ Senha validada — cumpre todas as regras!</div>
+    </div>
+  </section>
 
-      <div class="hint-box">
-        <b>Lembrete do Método da Frase-Chave:</b> pense numa frase pessoal — "Meu primeiro carro foi azul em 2015!" — pegue a primeira letra de cada palavra e junte o número e o símbolo do final. Resultado: <i>Mpcfae2015!</i>
+  <section class="panel" id="panel-frase">
+    <div class="card">
+      <h2>Crie sua senha com a Frase-Chave</h2>
+      <p class="sub">Escolha uma das frases abaixo. Depois, monte a senha juntando a 1ª letra de cada palavra com o número e o símbolo do final.</p>
+
+      <div class="phrase-list" id="phraseList"></div>
+
+      <div id="fraseComposer">
+        <div class="hint-box" id="fraseHint"></div>
+        <input type="text" id="fraseInput" placeholder="Digite a senha que você criou a partir da frase" autocomplete="off" spellcheck="false">
+        <div class="frase-live" id="fraseLive">Sua senha precisa ter: as iniciais da frase, o número da frase e um símbolo (@ # $ % !) no final.</div>
+        <button class="validate-btn" id="validateFrase" disabled>Validar senha</button>
+        <div class="validated-msg" id="fraseValidatedMsg">✓ Perfeito — sua senha aplica a técnica da Frase-Chave corretamente!</div>
       </div>
     </div>
   </section>
@@ -303,6 +374,31 @@
     </div>
   </section>
 
+  <section class="panel" id="panel-permissoes">
+    <div class="card">
+      <h2>Conceder ou recusar o acesso?</h2>
+      <p class="sub">Cada app está pedindo uma permissão no celular. Decida se faz sentido conceder ou recusar o acesso.</p>
+      <div class="msg-counter" id="permCounter">Situação 1 de 6</div>
+
+      <div class="letter" id="permBox">
+        <div class="perm-app-row">
+          <div class="perm-icon" id="permIcon"></div>
+          <div class="perm-appname" id="permApp"></div>
+        </div>
+        <div id="permBody"></div>
+        <div class="stamp" id="permStamp"></div>
+      </div>
+
+      <div class="quiz-actions">
+        <button id="btnGrant">Conceder acesso</button>
+        <button id="btnDeny">Recusar acesso</button>
+      </div>
+
+      <div class="explain" id="permExplainBox"></div>
+      <button class="nextbtn" id="permNextBtn">Próxima situação →</button>
+    </div>
+  </section>
+
   <section class="panel" id="panel-painel">
     <div class="card" id="painelCard">
       <div class="pin-gate" id="pinGate">
@@ -321,10 +417,6 @@
     </div>
   </section>
 
-  <footer>
-    <p>Checklist completo, atividades e casos reais seguem o roteiro da Aula 10.</p>
-    <button class="reset-link" onclick="location.reload()">↺ Reiniciar atividades</button>
-  </footer>
 </div>
 
 <script>
@@ -360,7 +452,7 @@ function startSession(){
   const val = document.getElementById('nameInput').value.trim();
   if(!val){ document.getElementById('nameInput').focus(); return; }
   currentUser = val;
-  myProgress = { nome: currentUser, senha:false, phishingScore:null, phishingTotal:null, trioScore:0, trioTotal:null };
+  myProgress = { nome: currentUser, senha:false, frase:false, phishingScore:null, phishingTotal:null, trioScore:0, trioTotal:null, permissoesScore:null, permissoesTotal:null };
   document.getElementById('nameGate').classList.add('hidden');
   const badge = document.getElementById('userBadge');
   badge.style.display = 'block';
@@ -414,6 +506,69 @@ validateBtn.addEventListener('click', ()=>{
   markTabDone('senha');
   if(myProgress && !myProgress.senha){
     myProgress.senha = true;
+    saveProgress();
+  }
+});
+
+// ---------- ACTIVITY: FRASE-CHAVE ----------
+const phrases = [
+  { text: "Meu primeiro carro foi azul em 2015!", initials: "mpcfae", digits: "2015" },
+  { text: "Minha cachorra Mel nasceu em 2018!", initials: "mcmne", digits: "2018" },
+  { text: "Eu moro na rua das Flores desde 2009!", initials: "emnrdfd", digits: "2009" },
+  { text: "Meu time do coração se chama Flamengo desde 2007!", initials: "mtdcscfd", digits: "2007" },
+];
+let selectedPhrase = null;
+
+const fraseInput = document.getElementById('fraseInput');
+const validateFraseBtn = document.getElementById('validateFrase');
+const fraseChecks = {
+  initials: {test: v => !!selectedPhrase && v.toLowerCase().includes(selectedPhrase.initials)},
+  digits: {test: v => !!selectedPhrase && v.includes(selectedPhrase.digits)},
+  symbol: {test: v => /[^A-Za-z0-9\s]/.test(v)},
+};
+let fraseAllOk = false;
+
+function checkFraseInput(){
+  const v = fraseInput.value;
+  const passed = Object.values(fraseChecks).every(c => c.test(v));
+  fraseAllOk = passed && v.length > 0;
+  const live = document.getElementById('fraseLive');
+  live.classList.toggle('ok', fraseAllOk);
+  live.textContent = fraseAllOk
+    ? '✓ Sua senha já aplica a técnica da Frase-Chave corretamente!'
+    : 'Sua senha ainda não está completa. Ela precisa ter: as iniciais da frase, o número da frase e um símbolo (@ # $ % !) no final.';
+  validateFraseBtn.disabled = !fraseAllOk;
+  validateFraseBtn.classList.toggle('enabled', fraseAllOk);
+  document.getElementById('fraseValidatedMsg').classList.remove('show');
+}
+fraseInput.addEventListener('input', checkFraseInput);
+
+const phraseListEl = document.getElementById('phraseList');
+phrases.forEach((p)=>{
+  const btn = document.createElement('button');
+  btn.className = 'phrase-btn';
+  btn.type = 'button';
+  btn.textContent = `"${p.text}"`;
+  btn.addEventListener('click', ()=>{
+    selectedPhrase = p;
+    document.querySelectorAll('.phrase-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('fraseComposer').classList.add('show');
+    document.getElementById('fraseHint').innerHTML =
+      `<b>Frase escolhida:</b> "${p.text}"<br>Pegue a 1ª letra de cada palavra (mantendo a ordem), depois junte o número e o símbolo do final.`;
+    fraseInput.value = '';
+    checkFraseInput();
+    fraseInput.focus();
+  });
+  phraseListEl.appendChild(btn);
+});
+
+validateFraseBtn.addEventListener('click', ()=>{
+  if(!fraseAllOk) return;
+  document.getElementById('fraseValidatedMsg').classList.add('show');
+  markTabDone('frase');
+  if(myProgress && !myProgress.frase){
+    myProgress.frase = true;
     saveProgress();
   }
 });
@@ -479,7 +634,7 @@ function answer(choseFake){
   stamp.textContent = m.isFake ? 'GOLPE' : 'APROVADO';
   stamp.classList.add('show', m.isFake ? 'golpe' : 'aprovado');
   const box = document.getElementById('explainBox');
-  box.textContent = (correct ? 'Certeza! ' : 'Quase — ') + m.explain;
+  box.textContent = (correct ? 'Você acertou! ' : 'Resposta errada. ') + m.explain;
   box.classList.add('show', m.isFake ? 'fake' : 'real');
   document.getElementById('btnReal').disabled = true;
   document.getElementById('btnFake').disabled = true;
@@ -495,7 +650,7 @@ function showFinalScore(){
       <div class="num">${score}/${messages.length}</div>
       <p style="color:var(--ink-dim);">mensagens classificadas corretamente</p>
     </div>`;
-  document.querySelector('.quiz-actions').style.display='none';
+  document.querySelector('#panel-phishing .quiz-actions').style.display='none';
   document.getElementById('nextBtn').classList.remove('show');
   markTabDone('phishing');
   if(myProgress){
@@ -551,6 +706,71 @@ scenarios.forEach((s, i)=>{
   });
 });
 
+// ---------- ACTIVITY: PERMISSÕES DO APP ----------
+const permScenarios = [
+  { app: "Lanterna", icon: "🔦", body: "Está pedindo permissão para acessar seus Contatos.", shouldGrant: false, explain: "Uma lanterna não precisa da sua lista de contatos para funcionar — recuse." },
+  { app: "Câmera do celular", icon: "📷", body: "Está pedindo permissão para acessar a Câmera.", shouldGrant: true, explain: "Faz sentido: sem a câmera, o app não consegue tirar fotos." },
+  { app: "Calculadora", icon: "🧮", body: "Está pedindo permissão para acessar sua Localização.", shouldGrant: false, explain: "Uma calculadora não tem nenhum motivo para saber onde você está — recuse." },
+  { app: "Waze (GPS)", icon: "🧭", body: "Está pedindo permissão para acessar sua Localização.", shouldGrant: true, explain: "Faz sentido: um app de rotas precisa da localização para funcionar." },
+  { app: "Editor de fotos", icon: "🖼️", body: "Está pedindo permissão para acessar seus Contatos e o Microfone.", shouldGrant: false, explain: "Editar fotos não exige contatos nem microfone — são permissões fora da função do app." },
+  { app: "WhatsApp", icon: "💬", body: "Está pedindo permissão para acessar a Câmera e o Microfone.", shouldGrant: true, explain: "Faz sentido: são necessários para chamadas de vídeo, áudios e envio de fotos." },
+];
+let permIndex = 0, permScore = 0, permAnswered = false;
+
+function loadPerm(){
+  if(permIndex >= permScenarios.length){ showPermFinalScore(); return; }
+  const s = permScenarios[permIndex];
+  document.getElementById('permCounter').textContent = `Situação ${permIndex+1} de ${permScenarios.length}`;
+  document.getElementById('permIcon').textContent = s.icon;
+  document.getElementById('permApp').textContent = s.app;
+  document.getElementById('permBody').textContent = s.body;
+  const stamp = document.getElementById('permStamp');
+  stamp.className = 'stamp';
+  stamp.textContent = '';
+  document.getElementById('permExplainBox').className = 'explain';
+  document.getElementById('permNextBtn').classList.remove('show');
+  document.getElementById('btnGrant').disabled = false;
+  document.getElementById('btnDeny').disabled = false;
+  permAnswered = false;
+}
+
+function answerPerm(granted){
+  if(permAnswered) return;
+  permAnswered = true;
+  const s = permScenarios[permIndex];
+  const correct = (granted === s.shouldGrant);
+  if(correct) permScore++;
+  const stamp = document.getElementById('permStamp');
+  stamp.textContent = s.shouldGrant ? 'CONCEDIDO' : 'RECUSADO';
+  stamp.classList.add('show', s.shouldGrant ? 'concedido' : 'recusado');
+  const box = document.getElementById('permExplainBox');
+  box.textContent = (correct ? 'Você acertou! ' : 'Resposta errada. ') + s.explain;
+  box.classList.add('show', s.shouldGrant ? 'real' : 'fake');
+  document.getElementById('btnGrant').disabled = true;
+  document.getElementById('btnDeny').disabled = true;
+  document.getElementById('permNextBtn').classList.add('show');
+}
+document.getElementById('btnGrant').addEventListener('click', ()=>answerPerm(true));
+document.getElementById('btnDeny').addEventListener('click', ()=>answerPerm(false));
+document.getElementById('permNextBtn').addEventListener('click', ()=>{ permIndex++; loadPerm(); });
+
+function showPermFinalScore(){
+  document.getElementById('permBox').outerHTML = `
+    <div class="score-final">
+      <div class="num">${permScore}/${permScenarios.length}</div>
+      <p style="color:var(--ink-dim);">situações resolvidas corretamente</p>
+    </div>`;
+  document.querySelector('#panel-permissoes .quiz-actions').style.display='none';
+  document.getElementById('permNextBtn').classList.remove('show');
+  markTabDone('permissoes');
+  if(myProgress){
+    myProgress.permissoesScore = permScore;
+    myProgress.permissoesTotal = permScenarios.length;
+    saveProgress();
+  }
+}
+loadPerm();
+
 // ---------- TEACHER PANEL (PIN gated) ----------
 document.getElementById('pinSubmit').addEventListener('click', checkPin);
 document.getElementById('pinInput').addEventListener('keydown', e=>{ if(e.key==='Enter') checkPin(); });
@@ -582,17 +802,21 @@ async function loadPanel(){
     records.sort((a,b)=> (a.nome||'').localeCompare(b.nome||''));
     const rows = records.map(rec=>{
       const senhaBadge = rec.senha ? '<span class="badge yes">Concluído</span>' : '<span class="badge no">Pendente</span>';
+      const fraseBadge = rec.frase ? '<span class="badge yes">Concluído</span>' : '<span class="badge no">Pendente</span>';
       const phishing = rec.phishingScore===null || rec.phishingScore===undefined || rec.phishingScore===''
         ? '<span class="badge no">Pendente</span>'
         : `<span class="badge yes">${rec.phishingScore}/${rec.phishingTotal}</span>`;
       const trio = !rec.trioTotal
         ? '<span class="badge no">Pendente</span>'
         : `<span class="badge yes">${rec.trioScore}/${rec.trioTotal}</span>`;
-      return `<tr><td>${rec.nome||'—'}</td><td>${senhaBadge}</td><td>${phishing}</td><td>${trio}</td></tr>`;
+      const permissoes = !rec.permissoesTotal
+        ? '<span class="badge no">Pendente</span>'
+        : `<span class="badge yes">${rec.permissoesScore}/${rec.permissoesTotal}</span>`;
+      return `<tr><td>${rec.nome||'—'}</td><td>${senhaBadge}</td><td>${fraseBadge}</td><td>${phishing}</td><td>${trio}</td><td>${permissoes}</td></tr>`;
     }).join('');
     content.innerHTML = `
       <table class="results">
-        <thead><tr><th>Aluno</th><th>Senha</th><th>Golpes</th><th>Trio</th></tr></thead>
+        <thead><tr><th>Aluno</th><th>Senha</th><th>Frase-Chave</th><th>Golpes</th><th>Trio</th><th>Permissões</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>`;
   }catch(e){
